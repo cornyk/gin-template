@@ -1,0 +1,25 @@
+# config files
+config.yaml
+
+# phpstorm project files
+.idea/
+
+# vscode project files
+.vscode/
+
+# netbeans project files
+nbproject
+
+# eclipse project files
+.buildpath
+.project
+.settings
+
+# windows thumbnail cache
+Thumbs.db
+
+# mac DS_Store files
+.DS_Store
+
+# log files
+*.log
