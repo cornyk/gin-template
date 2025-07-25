@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"cornyk/gin-template/internal/daos"
+	"cornyk/gin-template/internal/utils/response"
 	"cornyk/gin-template/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
@@ -16,5 +17,8 @@ func GetUsers(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, users)
+	response.SucJson(c, response.Pagination{
+		List:  users,
+		Count: len(users),
+	})
 }

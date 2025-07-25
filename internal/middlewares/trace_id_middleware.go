@@ -2,13 +2,12 @@ package middlewares
 
 import (
 	"context"
-	"cornyk/gin-template/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"strings"
 )
 
-// TraceIdMiddleware 为每个请求生成 trace-id，并添加到日志中
+// TraceIdMiddleware 为每个请求生成 trace-id
 func TraceIdMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 生成新的 trace-id
@@ -22,8 +21,6 @@ func TraceIdMiddleware() gin.HandlerFunc {
 
 		// 将修改后的 ctx 传递到 c.Request 上，以便后续处理中使用
 		c.Request = c.Request.WithContext(ctx)
-
-		logger.GetLogger(c).Info("New request received")
 
 		// 执行请求
 		c.Next()

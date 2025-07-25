@@ -33,15 +33,16 @@ func main() {
 	// 创建 Gin 路由
 	r := gin.Default()
 
-	// 使用 TraceIdMiddleware 为每个请求生成 trace-id
+	// 设置全局中间件
 	r.Use(middlewares.TraceIdMiddleware())
+	r.Use(middlewares.RequestLogMiddleware())
 
 	// 设置路由
 	routes.SetupRoutes(r)
 
 	// 启动服务器
 	serverAddress := fmt.Sprintf("%s:%d", loadConfig.Server.Host, loadConfig.Server.Port)
-	fmt.Println("\033[32m" + "Server started at http://" + serverAddress + "\033[0m")
+	fmt.Println("\033[32m" + "Server started at: http://" + serverAddress + "\033[0m")
 	err = r.Run(serverAddress)
 	if err != nil {
 		fmt.Println("Server failed to start")
