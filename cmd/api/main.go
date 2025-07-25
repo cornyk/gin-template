@@ -41,6 +41,7 @@ func main() {
 
 	// 启动服务器
 	serverAddress := fmt.Sprintf("%s:%d", loadConfig.Server.Host, loadConfig.Server.Port)
+	fmt.Println("\033[32m" + "Server started at http://" + serverAddress + "\033[0m")
 	err = r.Run(serverAddress)
 	if err != nil {
 		fmt.Println("Server failed to start")

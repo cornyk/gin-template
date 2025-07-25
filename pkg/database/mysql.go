@@ -62,7 +62,6 @@ func openDBConnection(dbConfig config.DatabaseConfig) (*gorm.DB, error) {
 		dbConfig.Charset,
 		dbConfig.ParseTime,
 	)
-	println(dsn)
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.NewGormLogger(), // 使用自定义的 SQL Logger

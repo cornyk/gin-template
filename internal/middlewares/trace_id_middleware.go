@@ -5,13 +5,14 @@ import (
 	"cornyk/gin-template/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"strings"
 )
 
 // TraceIdMiddleware 为每个请求生成 trace-id，并添加到日志中
 func TraceIdMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 生成新的 trace-id
-		traceID := uuid.New().String()
+		traceID := strings.ReplaceAll(uuid.New().String(), "-", "")
 
 		// 将 trace-id 添加到 Gin 上下文
 		c.Set("trace-id", traceID)
