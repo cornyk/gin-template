@@ -7,10 +7,10 @@ import (
 
 // Config 存储配置信息
 type Config struct {
-	Server            ServerConfig   `yaml:"server"`
-	Database          DatabaseConfig `yaml:"database"`
-	SecondaryDatabase DatabaseConfig `yaml:"secondaryDatabase"`
-	Redis             RedisConfig    `yaml:"redis"`
+	Server            ServerConfig           `yaml:"server"`
+	Database          DatabaseConfig         `yaml:"database"`
+	SecondaryDatabase DatabaseConfig         `yaml:"secondaryDatabase"`
+	Redis             map[string]RedisConfig `yaml:"redis"`
 }
 
 // ServerConfig 服务器配置
@@ -36,6 +36,7 @@ type RedisConfig struct {
 	Port     int    `yaml:"port"`
 	Password string `yaml:"password"`
 	DB       int    `yaml:"db"`
+	PoolSize int    `yaml:"pool_size"` // 默认100
 	Prefix   string `yaml:"prefix"`
 }
 

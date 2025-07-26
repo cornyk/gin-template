@@ -21,8 +21,22 @@ secondaryDatabase:
   parseTime: true
 
 redis:
-  host: "127.0.0.1"
-  port: 6379
-  password: "123456"
-  db: 0
-  prefix: ""
+  default:
+    host: "127.0.0.1"
+    port: 6379
+    password: "123456"
+    db: 0
+    prefix: "app"
+  cache:
+    host: "127.0.0.1"
+    port: 6379
+    password: "123456"
+    db: 1
+    prefix: "app:cache:"
+  session:
+    host: "127.0.0.1"
+    port: 6379
+    password: "123456"
+    db: 2
+    prefix: "app:session:"
+  

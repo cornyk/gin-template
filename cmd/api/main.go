@@ -32,7 +32,8 @@ func main() {
 	}
 
 	// 初始化Redis
-	redis.ConnectRedis(loadConfig)
+	redis.InitRedis(loadConfig)
+	defer redis.CloseAll()
 
 	// 创建 Gin 路由
 	r := gin.Default()

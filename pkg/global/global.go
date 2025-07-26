@@ -14,4 +14,4 @@ var GlobalConfig *config.Config
 var MainDB *gorm.DB
 var SecondaryDB *gorm.DB
 
-var MainRedis *redis.Client
+var RedisConn func(names ...string) *redis.Client

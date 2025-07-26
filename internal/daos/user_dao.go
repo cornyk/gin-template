@@ -9,8 +9,13 @@ import (
 
 // GetAllUsers 获取所有用户
 func GetAllUsers(c *gin.Context) ([]models.User, error) {
-	redis := global.MainRedis
+	redis := global.RedisConn()
 	redis.Set(c, "TEST_KEY", "testValue", time.Second*1000)
+
+	redis2 := global.RedisConn("cache")
+	redis3 := global.RedisConn("session")
+	redis2.Set(c, "TEST_KEY1", "testValue", time.Second*1000)
+	redis3.Set(c, "TEST_KEY2", "testValue", time.Second*1000)
 
 	db := global.MainDB
 	var users []models.User
