@@ -1,13 +1,12 @@
 package models
 
-// User 定义模型
+// User user table
 type User struct {
-	ID    uint   `json:"id" gorm:"primaryKey"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	Id    int32  `gorm:"column:id;primaryKey;autoIncrement" json:"id"`
+	Name  string `gorm:"column:name" json:"name"`
+	Email string `gorm:"column:email" json:"email"`
 }
 
-// TableName 返回模型对应的表名
-func (User) TableName() string {
-	return "user" // 自定义表名
+func (u *User) TableName() string {
+	return "user"
 }
