@@ -1,4 +1,4 @@
-package database
+package mysql
 
 import (
 	"cornyk/gin-template/pkg/config"

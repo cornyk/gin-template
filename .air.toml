@@ -2,8 +2,8 @@ root = "."
 tmp_dir = "runtime/air"
 
 [build]
-  cmd = "go build -o gin cmd/api/main.go"
-  bin = "./gin"
+  cmd = "go build -o api cmd/api/main.go"
+  bin = "./api"
   delay = 1000  # ms
   exclude_dir = ["build", "runtime"]
   include_ext = ["go", "yaml"]

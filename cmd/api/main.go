@@ -3,9 +3,10 @@ package main
 import (
 	"cornyk/gin-template/internal/middlewares"
 	"cornyk/gin-template/pkg/config"
-	"cornyk/gin-template/pkg/database"
+	"cornyk/gin-template/pkg/database/mysql"
 	"cornyk/gin-template/pkg/global"
 	"cornyk/gin-template/pkg/logger"
+	"cornyk/gin-template/pkg/redis"
 	"cornyk/gin-template/routes"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -25,10 +26,13 @@ func main() {
 	global.GlobalConfig = loadConfig
 
 	// 使用配置文件中的信息初始化数据库连接
-	err = database.ConnectDB(loadConfig)
+	err = mysql.ConnectDB(loadConfig)
 	if err != nil {
 		panic("failed to connect to the database")
 	}
+
+	// 初始化Redis
+	redis.ConnectRedis(loadConfig)
 
 	// 创建 Gin 路由
 	r := gin.Default()

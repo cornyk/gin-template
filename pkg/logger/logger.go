@@ -70,17 +70,7 @@ func GetLogger(ctx context.Context, channel ...string) *logrus.Entry {
 	currentDate := time.Now().Format("20060102")
 
 	// 根据不同类型的日志文件来设置路径
-	var logPath string
-	if logChannel == "sql" {
-		// SQL 错误日志
-		logPath = fmt.Sprintf("runtime/logs/sql_err-%s.log", currentDate)
-	} else if logChannel == "error" {
-		// 其他错误日志
-		logPath = fmt.Sprintf("runtime/logs/error-%s.log", currentDate)
-	} else {
-		// 默认日志路径
-		logPath = fmt.Sprintf("runtime/logs/%s-%s.log", logChannel, currentDate)
-	}
+	logPath := fmt.Sprintf("runtime/logs/%s-%s.log", logChannel, currentDate)
 
 	// 如果日志文件不存在，创建它
 	logFile, err = os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)

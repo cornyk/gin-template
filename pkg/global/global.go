@@ -2,6 +2,7 @@ package global
 
 import (
 	"cornyk/gin-template/pkg/config"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
@@ -12,3 +13,5 @@ var GlobalConfig *config.Config
 
 var MainDB *gorm.DB
 var SecondaryDB *gorm.DB
+
+var MainRedis *redis.Client

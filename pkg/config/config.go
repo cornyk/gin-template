@@ -10,6 +10,7 @@ type Config struct {
 	Server            ServerConfig   `yaml:"server"`
 	Database          DatabaseConfig `yaml:"database"`
 	SecondaryDatabase DatabaseConfig `yaml:"secondaryDatabase"`
+	Redis             RedisConfig    `yaml:"redis"`
 }
 
 // ServerConfig 服务器配置
@@ -27,6 +28,14 @@ type DatabaseConfig struct {
 	DBName    string `yaml:"dbname"`
 	Charset   string `yaml:"charset"`
 	ParseTime bool   `yaml:"parseTime"`
+}
+
+// RedisConfig Redis配置
+type RedisConfig struct {
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	Password string `yaml:"password"`
+	DB       int    `yaml:"db"`
 }
 
 // LoadConfig 读取配置文件并解析
