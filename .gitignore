@@ -1,5 +1,7 @@
 # compiled binaries
 api
+cli
+build/target/*
 
 # config files
 config.yaml

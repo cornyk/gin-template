@@ -13,13 +13,8 @@ func main() {
 	// 初始化日志
 	logger.InitLogger()
 
-	// 加载配置文件
-	loadConfig, err := config.LoadConfig("config.yaml")
-	if err != nil {
-		panic("Failed to load config file")
-	}
-
-	// 将配置文件内容保存到全局变量
+	// 加载配置文件并将配置文件内容保存到全局变量
+	loadConfig := config.LoadConfig("config.yaml")
 	global.GlobalConfig = loadConfig
 
 	// 初始化MySQL

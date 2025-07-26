@@ -16,13 +16,8 @@ func main() {
 	// 初始化日志
 	logger.InitLogger()
 
-	// 加载配置文件
-	loadConfig, err := config.LoadConfig("config.yaml")
-	if err != nil {
-		panic("Failed to load config file")
-	}
-
-	// 将配置文件内容保存到全局变量
+	// 加载配置文件并将配置文件内容保存到全局变量
+	loadConfig := config.LoadConfig("config.yaml")
 	global.GlobalConfig = loadConfig
 
 	// 初始化MySQL
@@ -46,7 +41,7 @@ func main() {
 	// 启动服务器
 	serverAddress := fmt.Sprintf("%s:%d", loadConfig.Server.Host, loadConfig.Server.Port)
 	fmt.Println("\033[32m" + "Server started at: http://" + serverAddress + "\033[0m")
-	err = r.Run(serverAddress)
+	err := r.Run(serverAddress)
 	if err != nil {
 		fmt.Println("Server failed to start")
 	}
