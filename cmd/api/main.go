@@ -25,11 +25,9 @@ func main() {
 	// 将配置文件内容保存到全局变量
 	global.GlobalConfig = loadConfig
 
-	// 使用配置文件中的信息初始化数据库连接
-	err = mysql.ConnectDB(loadConfig)
-	if err != nil {
-		panic("failed to connect to the database")
-	}
+	// 初始化MySQL
+	mysql.InitDB(loadConfig)
+	defer mysql.CloseAll()
 
 	// 初始化Redis
 	redis.InitRedis(loadConfig)

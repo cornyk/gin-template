@@ -3,14 +3,14 @@ package config
 import (
 	"github.com/spf13/viper"
 	"log"
+	"time"
 )
 
 // Config 存储配置信息
 type Config struct {
-	Server            ServerConfig           `yaml:"server"`
-	Database          DatabaseConfig         `yaml:"database"`
-	SecondaryDatabase DatabaseConfig         `yaml:"secondaryDatabase"`
-	Redis             map[string]RedisConfig `yaml:"redis"`
+	Server   ServerConfig              `yaml:"server"`
+	Database map[string]DatabaseConfig `yaml:"database"`
+	Redis    map[string]RedisConfig    `yaml:"redis"`
 }
 
 // ServerConfig 服务器配置
@@ -21,13 +21,16 @@ type ServerConfig struct {
 
 // DatabaseConfig 数据库配置
 type DatabaseConfig struct {
-	User      string `yaml:"user"`
-	Password  string `yaml:"password"`
-	Host      string `yaml:"host"`
-	Port      int    `yaml:"port"`
-	DBName    string `yaml:"dbname"`
-	Charset   string `yaml:"charset"`
-	ParseTime bool   `yaml:"parseTime"`
+	Host            string        `yaml:"host"`
+	Port            int           `yaml:"port"`
+	User            string        `yaml:"user"`
+	Password        string        `yaml:"password"`
+	DBName          string        `yaml:"dbname"`
+	Charset         string        `yaml:"charset"`
+	ParseTime       bool          `yaml:"parse_time"`
+	MaxIdleConns    int           `yaml:"max_idle_conns"`    // 默认10
+	MaxOpenConns    int           `yaml:"max_open_conns"`    // 默认100
+	ConnMaxLifetime time.Duration `yaml:"conn_max_lifetime"` // 默认1h
 }
 
 // RedisConfig Redis配置

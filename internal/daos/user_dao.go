@@ -17,7 +17,7 @@ func GetAllUsers(c *gin.Context) ([]models.User, error) {
 	redis2.Set(c, "TEST_KEY1", "testValue", time.Second*1000)
 	redis3.Set(c, "TEST_KEY2", "testValue", time.Second*1000)
 
-	db := global.MainDB
+	db := global.DBConn()
 	var users []models.User
 	if err := db.WithContext(c).Find(&users).Error; err != nil {
 		return nil, err

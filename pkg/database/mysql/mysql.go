@@ -5,74 +5,108 @@ import (
 	"cornyk/gin-template/pkg/global"
 	"cornyk/gin-template/pkg/logger"
 	"fmt"
+	"sync"
+	"time"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"log"
 )
 
-// ConnectDB 连接到多个数据库，并保存到全局变量中
-func ConnectDB(config *config.Config) error {
-	// 主数据库连接
-	mainDB, err := openDBConnection(config.Database)
-	if err != nil {
-		return err
+var (
+	dbs       = make(map[string]*gorm.DB)
+	mu        sync.RWMutex
+	defaultDB = "default" // 默认连接名称
+)
+
+// InitDB 初始化MySQL连接池
+func InitDB(config *config.Config) {
+	mu.Lock()
+	defer mu.Unlock()
+
+	// 初始化所有配置的连接
+	for name, cfg := range config.Database {
+		db := initConnection(cfg)
+		dbs[name] = db
 	}
-	global.MainDB = mainDB
 
-	// 副本数据库连接
-	secondaryDB, err := openDBConnection(config.SecondaryDatabase)
-	if err != nil {
-		return err
-	}
-	global.SecondaryDB = secondaryDB
-
-	return nil
-}
-
-// 设置回调钩子，将 trace-id 从 Gin 的上下文传递到 Gorm 的上下文
-func setTraceIDCallback() func(db *gorm.DB) {
-	return func(db *gorm.DB) {
-		// 从 db.Statement.Context 中获取 trace-id
-		traceID, _ := db.Statement.Context.Value("trace-id").(string)
-
-		// 如果没有 trace-id，则使用默认值
-		if traceID == "" {
-			traceID = "N/A"
-		}
-
-		// 将 trace-id 设置到 Gorm 的 Statement 中
-		db.Statement.Set("trace-id", traceID)
-
-		// 确保可以正确记录日志
-		sqlLogger := logger.GetLogger(db.Statement.Context)
-		if sqlLogger != nil {
-			sqlLogger.Info("Set trace-id in gorm statement", "trace-id", traceID)
-		}
+	// 设置全局访问函数
+	global.DBConn = func(names ...string) *gorm.DB {
+		return getDB(names...)
 	}
 }
 
-// openDBConnection 根据配置建立数据库连接
-func openDBConnection(dbConfig config.DatabaseConfig) (*gorm.DB, error) {
+func initConnection(cfg config.DatabaseConfig) *gorm.DB {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=%t&loc=Local",
-		dbConfig.User,
-		dbConfig.Password,
-		dbConfig.Host,
-		dbConfig.Port,
-		dbConfig.DBName,
-		dbConfig.Charset,
-		dbConfig.ParseTime,
+		cfg.User,
+		cfg.Password,
+		cfg.Host,
+		cfg.Port,
+		cfg.DBName,
+		cfg.Charset,
+		cfg.ParseTime,
 	)
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.NewGormLogger(), // 使用自定义的 SQL Logger
+		Logger: logger.NewGormLogger(),
 	})
 	if err != nil {
-		log.Fatalf("Error connecting to database: %v", err)
-		return nil, err
+		panic(fmt.Sprintf("MySQL连接失败: %v", err))
 	}
 
-	// 注册钩子，在每次数据库操作时传递 trace-id
-	db.Callback().Create().Before("gorm:create").Register("set_trace_id", setTraceIDCallback())
+	// 配置连接池
+	sqlDB, err := db.DB()
+	if err != nil {
+		panic(fmt.Sprintf("获取数据库连接失败: %v", err))
+	}
+	sqlDB.SetMaxIdleConns(cfg.MaxIdleConns)
+	sqlDB.SetMaxOpenConns(cfg.MaxOpenConns)
+	sqlDB.SetConnMaxLifetime(time.Duration(cfg.ConnMaxLifetime) * time.Second)
 
-	return db, nil
+	// 注册回调
+	registerCallbacks(db)
+
+	return db
+}
+
+func getDB(names ...string) *gorm.DB {
+	name := defaultDB
+	if len(names) > 0 && names[0] != "" {
+		name = names[0]
+	}
+
+	mu.RLock()
+	defer mu.RUnlock()
+
+	if db, ok := dbs[name]; ok {
+		return db
+	}
+	panic(fmt.Sprintf("MySQL连接[%s]未初始化", name))
+}
+
+// CloseAll 关闭所有数据库连接
+func CloseAll() {
+	mu.Lock()
+	defer mu.Unlock()
+
+	for name, db := range dbs {
+		if sqlDB, err := db.DB(); err == nil {
+			_ = sqlDB.Close()
+		}
+		delete(dbs, name)
+	}
+}
+
+func registerCallbacks(db *gorm.DB) {
+	_ = db.Callback().Create().Before("gorm:create").Register("set_trace_id", setTraceIDCallback())
+	// 可以添加其他回调...
+}
+
+func setTraceIDCallback() func(db *gorm.DB) {
+	return func(db *gorm.DB) {
+		traceID, _ := db.Statement.Context.Value("trace-id").(string)
+		if traceID == "" {
+			traceID = "N/A"
+		}
+		db.Statement.Set("trace-id", traceID)
+	}
 }

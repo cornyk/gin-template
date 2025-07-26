@@ -10,8 +10,7 @@ import (
 var GlobalConfig *config.Config
 
 // 定义全局数据库连接变量
-
-var MainDB *gorm.DB
-var SecondaryDB *gorm.DB
-
-var RedisConn func(names ...string) *redis.Client
+var (
+	DBConn    func(name ...string) *gorm.DB
+	RedisConn func(names ...string) *redis.Client
+)
