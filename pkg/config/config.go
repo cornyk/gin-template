@@ -36,6 +36,7 @@ type RedisConfig struct {
 	Port     int    `yaml:"port"`
 	Password string `yaml:"password"`
 	DB       int    `yaml:"db"`
+	Prefix   string `yaml:"prefix"`
 }
 
 // LoadConfig 读取配置文件并解析

@@ -17,6 +17,11 @@ func ConnectRedis(config *config.Config) {
 		DB:       config.Redis.DB,
 	})
 
+	// 如果配置了 prefix，才启用 Hook
+	if hook := NewPrefixHook(config.Redis.Prefix); hook != nil {
+		mainRedisConn.AddHook(hook)
+	}
+
 	// 测试连接
 	if err := mainRedisConn.Ping(ctx).Err(); err != nil {
 		panic("MainRedis connect error: " + err.Error())
