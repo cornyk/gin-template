@@ -1,6 +1,7 @@
 package config
 
 import (
+	"cornyk/gin-template/pkg/global"
 	"github.com/spf13/viper"
 	"time"
 )
@@ -52,7 +53,7 @@ type RedisConfig struct {
 }
 
 // LoadConfig 读取配置文件并解析
-func LoadConfig(configPath string) *Config {
+func LoadConfig(configPath string) {
 	viper.SetConfigFile(configPath)
 
 	// 读取配置文件
@@ -66,5 +67,5 @@ func LoadConfig(configPath string) *Config {
 		panic("Unable to decode config file into struct, " + err.Error())
 	}
 
-	return &config
+	global.GlobalConfig = &config
 }

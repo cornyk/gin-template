@@ -18,12 +18,12 @@ var (
 )
 
 // InitRedis 初始化Redis连接池
-func InitRedis(config *config.Config) {
+func InitRedis() {
 	mu.Lock()
 	defer mu.Unlock()
 
 	// 初始化所有配置的连接
-	for name, cfg := range config.Redis {
+	for name, cfg := range global.GlobalConfig.Redis {
 		client := initConnection(cfg)
 		if client != nil {
 			clients[name] = client
