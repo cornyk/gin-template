@@ -8,6 +8,7 @@ import (
 // Config 存储配置信息
 type Config struct {
 	Server   ServerConfig              `yaml:"server"`
+	App      AppConfig                 `yaml:"app"`
 	Database map[string]DatabaseConfig `yaml:"database"`
 	Redis    map[string]RedisConfig    `yaml:"redis"`
 }
@@ -16,6 +17,14 @@ type Config struct {
 type ServerConfig struct {
 	Host string `yaml:"host"`
 	Port int    `yaml:"port"`
+}
+
+// AppConfig 应用配置
+type AppConfig struct {
+	Name     string `yaml:"name"`
+	Env      string `yaml:"env"`
+	Debug    bool   `yaml:"debug"`
+	Timezone string `yaml:"timezone"`
 }
 
 // DatabaseConfig 数据库配置

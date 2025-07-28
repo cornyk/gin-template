@@ -19,7 +19,7 @@ func GetAllUsers(c *gin.Context) ([]models.User, error) {
 
 	db := global.DBConn()
 	var users []models.User
-	if err := db.WithContext(c).Find(&users).Error; err != nil {
+	if err := db.WithContext(c).Select("id", "name").Find(&users).Error; err != nil {
 		return nil, err
 	}
 	return users, nil

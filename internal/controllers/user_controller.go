@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"cornyk/gin-template/internal/daos"
+	"cornyk/gin-template/internal/exceptions"
 	"cornyk/gin-template/internal/utils/response"
 	"github.com/gin-gonic/gin"
 )
@@ -10,7 +11,7 @@ import (
 func GetUsers(c *gin.Context) {
 	users, err := daos.GetAllUsers(c)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.Error(&exceptions.BusinessError{Message: "test", Code: 123})
 		return
 	}
 	response.SucJson(c, response.Pagination{

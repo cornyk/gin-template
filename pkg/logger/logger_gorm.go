@@ -36,16 +36,15 @@ func formatLogMessage(msg string, data ...interface{}) string {
 func (g *gormLogger) logInfo(ctx context.Context, logLevel, msg string, data ...interface{}) {
 	logMessage := formatLogMessage(msg, data...)
 	finalMessage := fmt.Sprintf("%s", logMessage)
-	log := GetLogger(ctx, "sql") // 传递 ctx 给 GetLogger
 
 	// 记录日志
 	switch logLevel {
 	case "info":
-		log.Info(finalMessage)
+		GetLogger(ctx, "sql").Info(finalMessage)
 	case "warn":
-		log.Warn(finalMessage)
+		GetLogger(ctx, "sql").Warn(finalMessage)
 	case "error":
-		log.Error(finalMessage)
+		GetLogger(ctx, "sql_err").Error(finalMessage)
 	}
 }
 
@@ -67,19 +66,17 @@ func (g *gormLogger) Error(ctx context.Context, msg string, data ...interface{})
 // Trace 记录 SQL 查询日志
 func (g *gormLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
 	elapsed := time.Since(begin)
-	sql, _ := fc()
+	sql, rows := fc()
 
 	// 格式化 SQL 日志
-	sqlLog := fmt.Sprintf("[%v]%s", elapsed, sql)
-	logMessage := fmt.Sprintf("%s", sqlLog)
+	sqlLog := fmt.Sprintf("[%v][rows:%v]%s", elapsed, rows, sql)
 
-	// 打印日志
-	log := GetLogger(ctx, "sql") // 传递 ctx 给 GetLogger
-
-	// 如果有错误，记录错误日志
+	// 如果有错误，记录到sql_err通道
 	if err != nil {
-		log.WithError(err).Error(fmt.Sprintf("%s - Error: %v", logMessage, err))
+		GetLogger(ctx, "sql_err").
+			WithError(err).
+			Error(fmt.Sprintf("%s - Error: %v", sqlLog, err))
 	} else {
-		log.Info(logMessage)
+		GetLogger(ctx, "sql").Info(sqlLog)
 	}
 }

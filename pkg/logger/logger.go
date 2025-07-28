@@ -3,83 +3,194 @@ package logger
 import (
 	"context"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"os"
+	"path/filepath"
+	"strings"
+	"sync"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
-// Logger 是我们全局的日志记录器
-var Logger *logrus.Logger
+const (
+	defaultTraceID = "N/A"
+	defaultChannel = "app"
+	logFilePerm    = 0666
+	logDir         = "runtime/logs"
+	dateFormat     = "20060102"
+	timeFormat     = "2006-01-02 15:04:05"
+	maxLogDays     = 7
+	cleanInterval  = 24 * time.Hour
+)
 
-// CustomFormatter 自定义日志格式
-type CustomFormatter struct{}
+var (
+	globalLogger  *logrus.Logger
+	fileHandles   = make(map[string]*logFileHandle)
+	fileHandleMux sync.RWMutex
+	closeChan     = make(chan struct{})
+)
 
-// Format 实现 logrus.Formatter 接口
+type logFileHandle struct {
+	file     *os.File
+	lastUsed time.Time
+	channel  string
+}
+
+type CustomFormatter struct {
+	channel string
+}
+
 func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
-	// 获取当前时间并格式化为 [YYYY-mm-dd HH:ii:ss] 格式
-	logTime := time.Now().Format("2006-01-02 15:04:05")
-
-	// 获取 traceId（如果存在）
-	traceID, ok := entry.Data["trace-id"].(string)
-	if !ok {
-		traceID = "N/A" // 如果没有 trace-id，默认为 "N/A"
+	traceID := defaultTraceID
+	if id, ok := entry.Data["trace-id"].(string); ok {
+		traceID = id
 	}
 
-	// 格式化日志内容为 [YYYY-mm-dd HH:ii:ss][traceId][logLevel] log Content
-	logMessage := fmt.Sprintf("[%s][%s][%s]%s\n", logTime, traceID, entry.Level.String(), entry.Message)
-
-	return []byte(logMessage), nil
+	return []byte(fmt.Sprintf("[%s][%s][%s]%s\n",
+		time.Now().Format(timeFormat),
+		traceID,
+		entry.Level.String(),
+		entry.Message)), nil
 }
 
-// InitLogger 初始化日志配置
 func InitLogger() {
-	// 初始化日志记录器
-	Logger = logrus.New()
+	globalLogger = logrus.New()
+	globalLogger.SetLevel(logrus.InfoLevel)
 
-	// 设置自定义日志格式
-	Logger.SetFormatter(&CustomFormatter{})
-
-	// 设置日志等级
-	Logger.SetLevel(logrus.InfoLevel)
-}
-
-// GetLogger 获取全局日志实例，支持 channel 参数
-func GetLogger(ctx context.Context, channel ...string) *logrus.Entry {
-	// 如果没有传入 channel 参数，使用默认值 "app"
-	if len(channel) == 0 {
-		channel = append(channel, "app")
+	if err := os.MkdirAll(logDir, 0755); err != nil {
+		fmt.Printf("Failed to create log directory: %v\n", err)
 	}
 
-	// 获取第一个 channel 参数
-	logChannel := channel[0]
+	go startCleanupTask()
+}
 
-	// 获取 trace-id（如果存在），并将其传递给日志
-	traceID := "N/A" // 默认值
+func GetLogger(ctx context.Context, channel ...string) *logrus.Entry {
+	logChannel := defaultChannel
+	if len(channel) > 0 {
+		logChannel = channel[0]
+	}
+
+	traceID := defaultTraceID
 	if traceIDValue, ok := ctx.Value("trace-id").(string); ok {
 		traceID = traceIDValue
 	}
 
-	// 根据 channel 创建不同的日志输出，并将 trace-id 传递给 entry
-	log := Logger.WithField("channel", logChannel).WithField("trace-id", traceID)
+	logger := logrus.New()
+	logger.SetFormatter(&CustomFormatter{channel: logChannel})
+	logger.SetLevel(globalLogger.Level)
 
-	// 设置不同的输出文件
-	var logFile *os.File
-	var err error
+	handle := getFileHandle(logChannel)
+	logger.SetOutput(handle.file)
 
-	// 获取当前日期，格式化为 YYYYmmdd
-	currentDate := time.Now().Format("20060102")
+	return logger.WithFields(logrus.Fields{
+		"channel":  logChannel,
+		"trace-id": traceID,
+	})
+}
 
-	// 根据不同类型的日志文件来设置路径
-	logPath := fmt.Sprintf("runtime/logs/%s-%s.log", logChannel, currentDate)
+func getFileHandle(channel string) *logFileHandle {
+	fileHandleMux.Lock()
+	defer fileHandleMux.Unlock()
 
-	// 如果日志文件不存在，创建它
-	logFile, err = os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		Logger.Fatal("Error opening log file", err)
+	currentDate := time.Now().Format(dateFormat)
+	fileKey := channel + "-" + currentDate
+
+	if handle, exists := fileHandles[fileKey]; exists {
+		handle.lastUsed = time.Now()
+		return handle
 	}
 
-	// 将日志输出到指定文件
-	log.Logger.SetOutput(logFile)
+	logPath := filepath.Join(logDir, fileKey+".log")
+	file, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, logFilePerm)
+	if err != nil {
+		fmt.Printf("Error opening log file: %v\n", err)
+		return &logFileHandle{file: os.Stderr, channel: channel}
+	}
 
-	return log
+	handle := &logFileHandle{
+		file:     file,
+		lastUsed: time.Now(),
+		channel:  channel,
+	}
+	fileHandles[fileKey] = handle
+
+	return handle
+}
+
+func Cleanup() {
+	close(closeChan)
+	fileHandleMux.Lock()
+	defer fileHandleMux.Unlock()
+
+	for key, handle := range fileHandles {
+		if err := handle.file.Close(); err != nil {
+			fmt.Printf("Failed to close log file %s: %v\n", key, err)
+		}
+		delete(fileHandles, key)
+	}
+}
+
+func startCleanupTask() {
+	ticker := time.NewTicker(cleanInterval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			cleanOldLogs()
+			cleanInactiveHandles()
+		case <-closeChan:
+			return
+		}
+	}
+}
+
+func cleanOldLogs() {
+	files, err := os.ReadDir(logDir)
+	if err != nil {
+		fmt.Printf("Failed to read log directory: %v\n", err)
+		return
+	}
+
+	cutoffTime := time.Now().AddDate(0, 0, -maxLogDays)
+	var filesToDelete []string
+
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+
+		if !strings.HasSuffix(file.Name(), ".log") {
+			continue
+		}
+
+		info, err := file.Info()
+		if err != nil {
+			continue
+		}
+
+		if info.ModTime().Before(cutoffTime) {
+			filesToDelete = append(filesToDelete, file.Name())
+		}
+	}
+
+	for _, filename := range filesToDelete {
+		filePath := filepath.Join(logDir, filename)
+		if err := os.Remove(filePath); err != nil {
+			fmt.Printf("Failed to delete old log file %s: %v\n", filePath, err)
+		}
+	}
+}
+
+func cleanInactiveHandles() {
+	fileHandleMux.Lock()
+	defer fileHandleMux.Unlock()
+
+	cutoffTime := time.Now().Add(-1 * time.Hour)
+	for key, handle := range fileHandles {
+		if handle.lastUsed.Before(cutoffTime) {
+			_ = handle.file.Close()
+			delete(fileHandles, key)
+		}
+	}
 }

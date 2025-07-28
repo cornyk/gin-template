@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cornyk/gin-template/internal/exceptions"
 	"cornyk/gin-template/internal/middlewares"
 	"cornyk/gin-template/pkg/config"
 	"cornyk/gin-template/pkg/database/mysql"
@@ -29,11 +30,17 @@ func main() {
 	redis.InitRedis(loadConfig)
 	defer redis.CloseAll()
 
-	// 创建 Gin 路由
+	// 设置Gin模式并创建Gin路由
+	if global.GlobalConfig.App.Debug {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	r := gin.Default()
 
 	// 设置全局中间件
 	r.Use(middlewares.TraceIdMiddleware())
+	r.Use(exceptions.ErrorHandler()) // 全局处理异常
 	r.Use(middlewares.RequestLogMiddleware())
 
 	// 设置路由

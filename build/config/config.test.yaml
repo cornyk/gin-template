@@ -2,6 +2,12 @@ server:
   host: "localhost"
   port: 8080
 
+app:
+  name: "gin-template"
+  env: "test"
+  debug: true
+  timezone: "UTC"
+
 database:
   default:
     host: "127.0.0.1"

@@ -1,6 +1,7 @@
 package response
 
 import (
+	"cornyk/gin-template/internal/commons/response_def"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -22,11 +23,11 @@ type jsonResponse struct {
 func SucJson(c *gin.Context, data ...interface{}) {
 	switch len(data) {
 	case 0:
-		Json(c, CodeSuccess, MsgSuccess, nil)
+		Json(c, response_def.CodeSuccess, response_def.MsgSuccess, nil)
 	case 1:
-		Json(c, CodeSuccess, MsgSuccess, data[0])
+		Json(c, response_def.CodeSuccess, response_def.MsgSuccess, data[0])
 	default:
-		Json(c, CodeSuccess, MsgSuccess, data[0], data[1])
+		Json(c, response_def.CodeSuccess, response_def.MsgSuccess, data[0], data[1])
 	}
 }
 
