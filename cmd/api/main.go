@@ -19,14 +19,15 @@ func main() {
 	logger.InitLogger()
 
 	// 加载配置文件并将配置文件内容保存到全局变量
-	config.LoadConfig("config.yaml")
+	loadConfig := config.LoadConfig("config.yaml")
+	global.GlobalConfig = loadConfig
 
 	// 初始化MySQL
-	mysql.InitDB()
+	mysql.InitDB(loadConfig)
 	defer mysql.CloseAll()
 
 	// 初始化Redis
-	redis.InitRedis()
+	redis.InitRedis(loadConfig)
 	defer redis.CloseAll()
 
 	// 设置Gin模式并创建Gin路由
@@ -46,7 +47,7 @@ func main() {
 	routes.SetupRoutes(r)
 
 	// 使用 endless 优雅启动服务器
-	serverAddress := fmt.Sprintf("%s:%d", global.GlobalConfig.Server.Host, global.GlobalConfig.Server.Port)
+	serverAddress := fmt.Sprintf("%s:%d", loadConfig.Server.Host, loadConfig.Server.Port)
 	server := endless.NewServer(serverAddress, r)
 	fmt.Println("\033[32m" + "Server started at: http://" + serverAddress + "\033[0m")
 	if err := server.ListenAndServe(); err != nil {

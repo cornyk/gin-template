@@ -19,12 +19,12 @@ var (
 )
 
 // InitDB 初始化MySQL连接池
-func InitDB() {
+func InitDB(config *config.Config) {
 	mu.Lock()
 	defer mu.Unlock()
 
 	// 初始化所有配置的连接
-	for name, cfg := range global.GlobalConfig.Database {
+	for name, cfg := range config.Database {
 		db := initConnection(cfg)
 		dbs[name] = db
 	}
