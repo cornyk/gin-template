@@ -1,4 +1,4 @@
-package response
+package response_util
 
 import (
 	"cornyk/gin-template/internal/commons/response_def"

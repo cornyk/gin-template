@@ -3,7 +3,7 @@ package user_controller
 import (
 	"cornyk/gin-template/internal/daos/user_dao"
 	"cornyk/gin-template/internal/exceptions"
-	"cornyk/gin-template/internal/utils/response"
+	"cornyk/gin-template/internal/utils/response_util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,7 +14,7 @@ func GetUsers(c *gin.Context) {
 		c.Error(&exceptions.BusinessError{Message: "test", Code: 123})
 		return
 	}
-	response.SucJson(c, response.Pagination{
+	response_util.SucJson(c, response_util.Pagination{
 		List:  users,
 		Count: len(users),
 	})

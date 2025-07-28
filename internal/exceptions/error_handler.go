@@ -2,7 +2,7 @@ package exceptions
 
 import (
 	"cornyk/gin-template/internal/commons/response_def"
-	"cornyk/gin-template/internal/utils/response"
+	"cornyk/gin-template/internal/utils/response_util"
 	"cornyk/gin-template/pkg/global"
 	"cornyk/gin-template/pkg/logger"
 	"fmt"
@@ -24,7 +24,7 @@ func ErrorHandler() gin.HandlerFunc {
 				if global.GlobalConfig.App.Debug {
 					errorMessage = fmt.Sprintf("%v", r)
 				}
-				response.Json(c, response_def.CodeSystemError, errorMessage, nil, http.StatusInternalServerError)
+				response_util.Json(c, response_def.CodeSystemError, errorMessage, nil, http.StatusInternalServerError)
 			}
 		}()
 
@@ -41,7 +41,7 @@ func ErrorHandler() gin.HandlerFunc {
 				if e.HttpStatus != 0 {
 					httpStatus = e.HttpStatus
 				}
-				response.Json(c, e.Code, e.Message, nil, httpStatus)
+				response_util.Json(c, e.Code, e.Message, nil, httpStatus)
 				return
 			case *SystemError: // 系统错误不仅返回且需要记录日志
 				// 记录日志
@@ -51,7 +51,7 @@ func ErrorHandler() gin.HandlerFunc {
 				if e.HttpStatus != 0 {
 					httpStatus = e.HttpStatus
 				}
-				response.Json(c, e.Code, e.Message, nil, httpStatus)
+				response_util.Json(c, e.Code, e.Message, nil, httpStatus)
 				return
 			default: // 其他为明确类型的错误，格式化返回并记录日志，Debug模式下会输出真实错误信息
 				// 记录日志
@@ -62,7 +62,7 @@ func ErrorHandler() gin.HandlerFunc {
 				if global.GlobalConfig.App.Debug {
 					errorMessage = e.Error()
 				}
-				response.Json(c, response_def.CodeSystemError, errorMessage, nil, http.StatusInternalServerError)
+				response_util.Json(c, response_def.CodeSystemError, errorMessage, nil, http.StatusInternalServerError)
 				return
 			}
 		}
