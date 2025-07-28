@@ -63,7 +63,7 @@ func LoadConfig(configPath string) *Config {
 	var config Config
 	err := viper.Unmarshal(&config)
 	if err != nil {
-		panic("Unable to decode into struct, " + err.Error())
+		panic("Unable to decode config file into struct, " + err.Error())
 	}
 
 	return &config

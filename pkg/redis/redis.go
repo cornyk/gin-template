@@ -36,7 +36,7 @@ func InitRedis(config *config.Config) {
 			return getClient(name...)
 		}
 	} else {
-		panic("default Redis connection not configured")
+		panic("Default Redis connection not configured")
 	}
 }
 
@@ -55,7 +55,7 @@ func initConnection(cfg config.RedisConfig) *redis.Client {
 
 	// 测试连接
 	if err := client.Ping(ctx).Err(); err != nil {
-		panic(fmt.Sprintf("Redis连接失败: %v", err))
+		panic(fmt.Sprintf("Redis connect failed: %v", err))
 	}
 
 	return client
@@ -73,7 +73,7 @@ func getClient(names ...string) *redis.Client {
 	if client, ok := clients[name]; ok {
 		return client
 	}
-	panic(fmt.Sprintf("Redis连接[%s]未初始化", name))
+	panic(fmt.Sprintf("Redis connection [%s] uninitialized", name))
 }
 
 // CloseAll 关闭所有Redis连接
@@ -83,7 +83,7 @@ func CloseAll() {
 
 	for name, client := range clients {
 		if err := client.Close(); err != nil {
-			fmt.Printf("关闭Redis连接[%s]失败: %v\n", name, err)
+			fmt.Printf("Close Redis connection [%s] failed: %v\n", name, err)
 		}
 		delete(clients, name)
 	}

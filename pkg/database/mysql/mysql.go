@@ -50,13 +50,13 @@ func initConnection(cfg config.DatabaseConfig) *gorm.DB {
 		Logger: logger.NewGormLogger(),
 	})
 	if err != nil {
-		panic(fmt.Sprintf("MySQL连接失败: %v", err))
+		panic(fmt.Sprintf("MySQL connect failed: %v", err))
 	}
 
 	// 配置连接池
 	sqlDB, err := db.DB()
 	if err != nil {
-		panic(fmt.Sprintf("获取数据库连接失败: %v", err))
+		panic(fmt.Sprintf("Failed to open MySQL connection: %v", err))
 	}
 	sqlDB.SetMaxIdleConns(cfg.MaxIdleConns)
 	sqlDB.SetMaxOpenConns(cfg.MaxOpenConns)
@@ -80,7 +80,7 @@ func getDB(names ...string) *gorm.DB {
 	if db, ok := dbs[name]; ok {
 		return db
 	}
-	panic(fmt.Sprintf("MySQL连接[%s]未初始化", name))
+	panic(fmt.Sprintf("MySQL connection [%s] uninitialized", name))
 }
 
 // CloseAll 关闭所有数据库连接

@@ -8,7 +8,7 @@ import (
 )
 
 // GetAllUsers 获取所有用户
-func GetAllUsers(c *gin.Context) ([]models.User, error) {
+func GetAllUsers(c *gin.Context) ([]models.UserModel, error) {
 	redis := global.RedisConn()
 	redis.Set(c, "TEST_KEY", "testValue", time.Second*1000)
 
@@ -18,7 +18,7 @@ func GetAllUsers(c *gin.Context) ([]models.User, error) {
 	redis3.Set(c, "TEST_KEY2", "testValue", time.Second*1000)
 
 	db := global.DBConn()
-	var users []models.User
+	var users []models.UserModel
 	if err := db.WithContext(c).Select("id", "name").Find(&users).Error; err != nil {
 		return nil, err
 	}

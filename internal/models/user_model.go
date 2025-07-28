@@ -1,12 +1,12 @@
 package models
 
-// User user table
-type User struct {
+// UserModel user table
+type UserModel struct {
 	Id    int32  `gorm:"column:id;primaryKey;autoIncrement" json:"id"`
 	Name  string `gorm:"column:name" json:"name"`
 	Email string `gorm:"column:email" json:"email"`
 }
 
-func (u *User) TableName() string {
+func (u *UserModel) TableName() string {
 	return "user"
 }

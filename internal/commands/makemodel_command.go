@@ -34,7 +34,7 @@ func MakeModelCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     "makemodel <model_name>",
-		Short:   "自动生成包含表注释和字段注释的GORM模型",
+		Short:   "Automatically generate Gorm models",
 		Example: "makemodel user_model\nmakemodel order_model --db=secondary",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -74,7 +74,7 @@ func generateModel(modelName, dbConn string) error {
 		Columns      []ColumnDef
 	}{
 		Package:      "models",
-		ModelName:    toCamelCase(modelName),
+		ModelName:    toCamelCase(modelName) + "Model",
 		TableName:    tableName,
 		TableComment: tableComment,
 		Columns:      columns,
