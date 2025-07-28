@@ -1,4 +1,4 @@
-package daos
+package user_dao
 
 import (
 	"cornyk/gin-template/internal/models"
