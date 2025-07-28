@@ -30,8 +30,8 @@ func InitDB(config *config.Config) {
 	}
 
 	// 设置全局访问函数
-	global.DBConn = func(names ...string) *gorm.DB {
-		return getDB(names...)
+	global.DBConn = func(name ...string) *gorm.DB {
+		return getDB(name...)
 	}
 }
 

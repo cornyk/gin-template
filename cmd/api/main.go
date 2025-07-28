@@ -9,6 +9,7 @@ import (
 	"cornyk/gin-template/pkg/redis"
 	"cornyk/gin-template/routes"
 	"fmt"
+	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,11 +39,11 @@ func main() {
 	// 设置路由
 	routes.SetupRoutes(r)
 
-	// 启动服务器
+	// 使用 endless 优雅启动服务器
 	serverAddress := fmt.Sprintf("%s:%d", loadConfig.Server.Host, loadConfig.Server.Port)
+	server := endless.NewServer(serverAddress, r)
 	fmt.Println("\033[32m" + "Server started at: http://" + serverAddress + "\033[0m")
-	err := r.Run(serverAddress)
-	if err != nil {
-		fmt.Println("Server failed to start")
+	if err := server.ListenAndServe(); err != nil {
+		fmt.Printf("Server failed to start: %v\n", err)
 	}
 }

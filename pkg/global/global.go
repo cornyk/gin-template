@@ -12,5 +12,5 @@ var GlobalConfig *config.Config
 // 定义全局数据库连接变量
 var (
 	DBConn    func(name ...string) *gorm.DB
-	RedisConn func(names ...string) *redis.Client
+	RedisConn func(name ...string) *redis.Client
 )
