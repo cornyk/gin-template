@@ -6,9 +6,10 @@ import (
 	"cornyk/gin-template/pkg/global"
 	"cornyk/gin-template/pkg/logger"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"runtime/debug"
+
+	"github.com/gin-gonic/gin"
 )
 
 func ErrorHandler() gin.HandlerFunc {

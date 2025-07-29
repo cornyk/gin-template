@@ -3,8 +3,9 @@ package user_dao
 import (
 	"cornyk/gin-template/internal/models"
 	"cornyk/gin-template/pkg/global"
-	"github.com/gin-gonic/gin"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 // GetAllUsers 获取所有用户

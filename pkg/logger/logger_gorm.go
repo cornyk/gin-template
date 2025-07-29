@@ -3,8 +3,9 @@ package logger
 import (
 	"context"
 	"fmt"
-	"gorm.io/gorm/logger"
 	"time"
+
+	"gorm.io/gorm/logger"
 )
 
 // NewGormLogger 创建一个定制的 Gorm Logger

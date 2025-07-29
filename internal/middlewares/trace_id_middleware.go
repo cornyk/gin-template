@@ -2,9 +2,10 @@ package middlewares
 
 import (
 	"context"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"strings"
 )
 
 // TraceIdMiddleware 为每个请求生成 trace-id

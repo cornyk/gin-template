@@ -8,19 +8,24 @@ import (
 	"cornyk/gin-template/pkg/global"
 	"cornyk/gin-template/pkg/logger"
 	"cornyk/gin-template/pkg/redis"
+	"cornyk/gin-template/pkg/timezone"
 	"cornyk/gin-template/routes"
 	"fmt"
+
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	// 初始化日志
-	logger.InitLogger()
-
 	// 加载配置文件并将配置文件内容保存到全局变量
 	loadConfig := config.LoadConfig("config.yaml")
 	global.GlobalConfig = loadConfig
+
+	// 设置全局时区
+	timezone.InitTimezone(loadConfig.App.Timezone)
+
+	// 初始化日志
+	logger.InitLogger()
 
 	// 初始化MySQL
 	mysql.InitDB(loadConfig)
@@ -31,7 +36,7 @@ func main() {
 	defer redis.CloseAll()
 
 	// 设置Gin模式并创建Gin路由
-	if global.GlobalConfig.App.Debug {
+	if loadConfig.App.Debug {
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)

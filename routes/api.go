@@ -4,8 +4,9 @@ import (
 	"cornyk/gin-template/internal/commons/response_def"
 	"cornyk/gin-template/internal/controllers/user_controller"
 	"cornyk/gin-template/internal/utils/response_util"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // SetupRoutes 设置用户相关的路由

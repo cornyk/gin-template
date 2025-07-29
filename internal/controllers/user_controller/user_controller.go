@@ -4,6 +4,7 @@ import (
 	"cornyk/gin-template/internal/daos/user_dao"
 	"cornyk/gin-template/internal/exceptions"
 	"cornyk/gin-template/internal/utils/response_util"
+
 	"github.com/gin-gonic/gin"
 )
 

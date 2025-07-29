@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"cornyk/gin-template/pkg/logger"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"io"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func RequestLogMiddleware() gin.HandlerFunc {
