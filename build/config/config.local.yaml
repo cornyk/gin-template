@@ -50,3 +50,18 @@ redis:
     db: 2
     prefix: "app:session:"
   
+beanstalkd:
+  default:
+    host: "127.0.0.1"
+    port: 11300
+    tube: "default"
+    pri: 1024
+    delay: 0
+    ttr: 60
+  reporting:
+    host: "127.0.0.1"
+    port: 11300
+    tube: "reporting"
+    pri: 1024
+    delay: 0
+    ttr: 60

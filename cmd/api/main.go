@@ -7,6 +7,7 @@ import (
 	"cornyk/gin-template/pkg/database/mysql"
 	"cornyk/gin-template/pkg/global"
 	"cornyk/gin-template/pkg/logger"
+	"cornyk/gin-template/pkg/queue/beanstalkd"
 	"cornyk/gin-template/pkg/redis"
 	"cornyk/gin-template/pkg/timezone"
 	"cornyk/gin-template/routes"
@@ -34,6 +35,10 @@ func main() {
 	// 初始化Redis
 	redis.InitRedis(loadConfig)
 	defer redis.CloseAll()
+
+	// 初始化Beanstalkd
+	beanstalkd.InitBeanstalkd(loadConfig)
+	defer beanstalkd.CloseAll()
 
 	// 设置Gin模式并创建Gin路由
 	if loadConfig.App.Debug {

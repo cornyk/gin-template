@@ -8,10 +8,11 @@ import (
 
 // Config 存储配置信息
 type Config struct {
-	Server   ServerConfig              `yaml:"server"`
-	App      AppConfig                 `yaml:"app"`
-	Database map[string]DatabaseConfig `yaml:"database"`
-	Redis    map[string]RedisConfig    `yaml:"redis"`
+	Server     ServerConfig                `yaml:"server"`
+	App        AppConfig                   `yaml:"app"`
+	Database   map[string]DatabaseConfig   `yaml:"database"`
+	Redis      map[string]RedisConfig      `yaml:"redis"`
+	Beanstalkd map[string]BeanstalkdConfig `yaml:"beanstalkd"`
 }
 
 // ServerConfig 服务器配置
@@ -50,6 +51,16 @@ type RedisConfig struct {
 	DB       int    `yaml:"db"`
 	PoolSize int    `yaml:"pool_size"` // 默认100
 	Prefix   string `yaml:"prefix"`
+}
+
+// BeanstalkdConfig Beanstalkd 配置
+type BeanstalkdConfig struct {
+	Host  string `yaml:"host"`
+	Port  int    `yaml:"port"`
+	Tube  string `yaml:"tube"`
+	Pri   uint32 `yaml:"pri"`
+	Delay int    `yaml:"delay"` // 秒
+	TTR   int    `yaml:"ttr"`   // 秒
 }
 
 // LoadConfig 读取配置文件并解析

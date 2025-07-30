@@ -3,6 +3,7 @@ module cornyk/gin-template
 go 1.23.4
 
 require (
+	github.com/beanstalkd/go-beanstalk v0.2.0
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-gonic/gin v1.10.1
 	github.com/google/uuid v1.6.0
