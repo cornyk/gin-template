@@ -50,8 +50,10 @@ func main() {
 
 	// 设置全局中间件
 	r.Use(middlewares.TraceIdMiddleware())
-	r.Use(exceptions.ErrorHandler()) // 全局处理异常
 	r.Use(middlewares.RequestLogMiddleware())
+
+	// 全局处理异常
+	r.Use(exceptions.ErrorHandler())
 
 	// 设置路由
 	routes.SetupRoutes(r)

@@ -11,7 +11,7 @@ import (
 func InitBeanstalkd(config *config.Config) {
 	// 初始化所有配置的 beanstalkd 连接
 	for name, cfg := range config.Beanstalkd {
-		tubeConn, err := connection.NewTubeConnection(cfg.Host, cfg.Port, cfg.Tube)
+		tubeConn, err := connection.NewTubeConnection(cfg.Host, cfg.Port, cfg.Tube, cfg.Pri, cfg.Delay, cfg.TTR, cfg.TimeOut)
 		if err != nil {
 			panic(fmt.Sprintf("Failed to connect to beanstalkd %s: %v", name, err))
 		}

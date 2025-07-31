@@ -58,6 +58,7 @@ beanstalkd:
     pri: 1024
     delay: 0
     ttr: 60
+    timeout: 10
   reporting:
     host: "127.0.0.1"
     port: 11300
@@ -65,3 +66,4 @@ beanstalkd:
     pri: 1024
     delay: 0
     ttr: 60
+    timeout: 10

@@ -55,12 +55,13 @@ type RedisConfig struct {
 
 // BeanstalkdConfig Beanstalkd 配置
 type BeanstalkdConfig struct {
-	Host  string `yaml:"host"`
-	Port  int    `yaml:"port"`
-	Tube  string `yaml:"tube"`
-	Pri   uint32 `yaml:"pri"`
-	Delay int    `yaml:"delay"` // 秒
-	TTR   int    `yaml:"ttr"`   // 秒
+	Host    string `yaml:"host"`
+	Port    int    `yaml:"port"`
+	Tube    string `yaml:"tube"`
+	Pri     uint32 `yaml:"pri"`
+	Delay   int    `yaml:"delay"`   // 秒
+	TTR     int    `yaml:"ttr"`     // 秒
+	TimeOut int    `yaml:"timeout"` // 秒
 }
 
 // LoadConfig 读取配置文件并解析
