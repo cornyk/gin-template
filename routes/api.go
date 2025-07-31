@@ -2,7 +2,7 @@ package routes
 
 import (
 	"cornyk/gin-template/internal/commons/response_def"
-	"cornyk/gin-template/internal/controllers/user_controller"
+	"cornyk/gin-template/internal/controllers"
 	"cornyk/gin-template/internal/utils/response_util"
 	"net/http"
 
@@ -12,7 +12,9 @@ import (
 // SetupRoutes 设置用户相关的路由
 func SetupRoutes(router *gin.Engine) {
 
-	router.GET("/users", user_controller.GetUsers)
+	userController := controllers.UserController{}
+
+	router.GET("/users", userController.GetUsers)
 
 	// health check url
 	router.Any("/ping", func(c *gin.Context) {
