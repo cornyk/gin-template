@@ -9,6 +9,7 @@
 | Redis库    | go-redis |
 | 日志        | logrus   |
 | 配置管理      | viper    |
+| Beanstalkd队列 | go-beanstalk |
 
 ### 项目使用
 + 下载本项目后然后重命名包名
